@@ -1211,7 +1211,14 @@ function AppContent() {
 
       try {
         if (options.format === 'drawio') {
-          const allNodes = reactFlowInstance.getNodes();
+          // Merge store nodes with annotations state — annotations may not
+          // be in the React Flow store if the canvas hasn't re-synced yet.
+          const storeNodes = reactFlowInstance.getNodes();
+          const storeIds = new Set(storeNodes.map((n) => n.id));
+          const missingAnnotations = annotations.filter(
+            (a) => !storeIds.has(a.id),
+          );
+          const allNodes = [...storeNodes, ...missingAnnotations];
           const allEdges = reactFlowInstance.getEdges();
           const diagramName =
             options.title ||
@@ -1379,7 +1386,7 @@ function AppContent() {
         );
       }
     },
-    [selectedStacks, reactFlowInstance],
+    [selectedStacks, reactFlowInstance, annotations],
   );
 
   return (

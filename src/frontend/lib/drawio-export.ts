@@ -76,6 +76,7 @@ function getNodeLabel(node: Node, iconDataUrls: Map<string, string>): string {
       );
     }
     case 'textAnnotation':
+    case 'calloutAnnotation':
       return xmlEscape(String(d.text ?? ''));
     default:
       return buildHtmlLabel(String(d.label ?? node.id));
@@ -100,11 +101,21 @@ function getNodeStyle(node: Node): string {
       const color = String(d.color ?? '#fff9c4');
       return `text;html=0;align=left;verticalAlign=top;whiteSpace=wrap;overflow=hidden;fillColor=${color};strokeColor=none;`;
     }
-    case 'calloutAnnotation':
-      return 'shape=callout;whiteSpace=wrap;html=0;fillColor=#fff9c4;strokeColor=#a0a0a0;';
+    case 'calloutAnnotation': {
+      const color = String(d.color ?? '#fff9c4');
+      const dirMap: Record<string, string> = {
+        top: 'north',
+        right: 'east',
+        bottom: 'south',
+        left: 'west',
+      };
+      const dir = dirMap[String(d.arrowPosition ?? 'right')] ?? 'east';
+      return `shape=callout;direction=${dir};whiteSpace=wrap;html=0;fillColor=${color};strokeColor=#a0a0a0;`;
+    }
     case 'highlightBox': {
       const color = String(d.color ?? '#fff2cc');
-      return `rounded=1;whiteSpace=wrap;html=0;fillColor=${color};strokeColor=#d6b656;opacity=50;`;
+      const opacity = Math.round(Number(d.opacity ?? 0.3) * 100);
+      return `rounded=1;whiteSpace=wrap;html=0;fillColor=${color};strokeColor=${color};opacity=${opacity};`;
     }
     default:
       return 'rounded=1;whiteSpace=wrap;html=0;';
@@ -165,8 +176,13 @@ export async function exportToDrawio(
     const x = Math.round(node.position.x);
     const y = Math.round(node.position.y);
     const isGroup = node.type === 'group' || node.type === 'customGroup';
-    const w = Math.round(node.width ?? (isGroup ? 300 : 160));
-    const h = Math.round(node.height ?? (isGroup ? 200 : 80));
+    const d = node.data ?? {};
+    const w = Math.round(
+      (node.width ?? Number(d.width || 0)) || (isGroup ? 300 : 160),
+    );
+    const h = Math.round(
+      (node.height ?? Number(d.height || 0)) || (isGroup ? 200 : 80),
+    );
     const tooltip =
       node.type === 'resourceNode'
         ? ` tooltip="${xmlEscape(String(node.data?.type ?? ''))}"`
