@@ -12,24 +12,28 @@ Transform your AWS CDK stacks into beautiful, customizable diagrams. CDK-Canvas 
 ## ✨ Features
 
 ### 🎨 **Interactive Diagram Designer**
+
 - **Drag & Drop**: Reposition resources with pixel-perfect precision
 - **Three Layout Modes**: Dependency graph, network topology, or grouped by type
 - **Multi-Stack Support**: Visualize multiple stacks in a single diagram
 - **60+ AWS Resources**: Pre-mapped icons for Lambda, S3, RDS, VPC, and more
 
 ### 🎯 **Professional Customization**
+
 - **Custom Grouping**: Create labeled containers to organize related resources
 - **Annotations**: Add text notes, callouts, and highlight boxes for documentation
 - **Styling Panel**: Customize colors, fonts, and alignment across your diagram
 - **Light/Dark Themes**: Automatic theme switching for comfortable viewing
 
 ### 🛡️ **Security Detection**
+
 - **Automatic Scanning**: Identifies common security misconfigurations
 - **Visual Warnings**: Red badges highlight resources with security issues
 - **Actionable Recommendations**: Get specific fix suggestions for each issue
 - **Severity Filtering**: Focus on critical issues or review all warnings
 
 ### 📸 **Export & Share**
+
 - **PNG/SVG Export**: Generate publication-ready diagrams
 - **Custom Branding**: Add your logo, title, and footer
 - **Save Layouts**: Preserve your custom arrangements
@@ -78,12 +82,15 @@ That's it! Select your stacks from the sidebar and start designing.
 ### Layout Modes
 
 #### 🔀 **Dependency View**
+
 Hierarchical layout showing resource dependencies top-to-bottom. Perfect for understanding deployment order and data flow.
 
 #### 🌐 **Topology View**
+
 Network-centric layout with AWS Cloud boundary, VPC containers, and CIDR legend. Ideal for network architecture diagrams.
 
 #### 📦 **By Type View**
+
 Resources grouped by service type (Lambda, DynamoDB, S3, etc.). Best for resource inventory and categorization.
 
 ### Annotations
@@ -95,6 +102,7 @@ Add documentation directly on your diagrams:
 - **🔆 Highlight Boxes**: Semi-transparent areas to emphasize regions
 
 **To add annotations:**
+
 1. Click **📝 Annotate** in the toolbar
 2. Select type (Text Note, Callout, or Highlight Box)
 3. Drag to position
@@ -114,12 +122,12 @@ CDK-Canvas automatically scans for common security issues:
 
 ### Keyboard Shortcuts
 
-| Action | Shortcut |
-|--------|----------|
-| Fit to view | `F` |
-| Save layout | `Cmd/Ctrl + S` |
-| Multi-select | `Shift + Click` or box selection |
-| Delete node/edge | `Delete` or `Backspace` |
+| Action           | Shortcut                         |
+| ---------------- | -------------------------------- |
+| Fit to view      | `F`                              |
+| Save layout      | `Cmd/Ctrl + S`                   |
+| Multi-select     | `Shift + Click` or box selection |
+| Delete node/edge | `Delete` or `Backspace`          |
 
 ---
 
@@ -265,12 +273,14 @@ cdk-canvas/
 ### Running Locally
 
 **Terminal 1 - Frontend (hot reload):**
+
 ```bash
 cd packages/frontend
 pnpm run dev
 ```
 
 **Terminal 2 - Backend:**
+
 ```bash
 cd packages/cdk-canvas
 npx ts-node src/cli/index.ts --cdk-out /path/to/cdk.out
@@ -283,28 +293,33 @@ Open http://localhost:3000 (or the Vite dev server port).
 ## 🐛 Troubleshooting
 
 ### "No stacks found"
+
 - Ensure you've run `cdk synth` in your CDK project
 - Verify `cdk.out/` directory exists
 - Check that `cdk.out/` contains `*.template.json` files
 
 ### "Port 3000 already in use"
+
 ```bash
 # Use a different port
 npx cdk-canvas --port 3001
 ```
 
 ### Icons not loading
+
 - Icons are bundled with the package
 - Check browser console for 404 errors
 - Ensure you're using the latest version: `npm update @skyionblue/cdk-canvas`
 
 ### Export fails or looks wrong
+
 - Ensure all nodes are visible (not off-canvas)
 - Try adjusting export dimensions
 - Check browser console for errors
 - Hard refresh browser: `Cmd/Ctrl + Shift + R`
 
 ### Security scan missing issues
+
 - Only scans resources with CloudFormation properties
 - CDK-generated resources may use Refs/GetAtt (shown as `{Ref: ...}`)
 - Custom constructs may not expose properties in CloudFormation
@@ -314,12 +329,14 @@ npx cdk-canvas --port 3001
 ## 🗺️ Roadmap
 
 ### ✅ Completed
+
 - Phase 1: MVP (basic visualization, layouts, export)
 - Phase 2: Advanced features (multi-stack, filters, styling, themes)
 - Phase 3.1: Security detection (bare bones)
 - Phase 3.2: Annotations
 
 ### 🚧 Future Enhancements
+
 - More security checks (custom rules, SIEM integration)
 - Export security reports (PDF/CSV)
 - Keyboard shortcuts for annotations
@@ -358,6 +375,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🌟 Show Your Support
 
 If CDK-Canvas helps you build better infrastructure, please:
+
 - ⭐ Star the repository
 - 🐛 Report bugs and suggest features
 - 🔧 Contribute improvements

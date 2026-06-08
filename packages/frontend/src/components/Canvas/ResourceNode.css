@@ -86,7 +86,9 @@
   background: var(--accent-primary);
   border: 2px solid var(--node-bg);
   opacity: 0.6;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .react-flow__handle:hover {
@@ -137,7 +139,8 @@
 }
 
 @keyframes pulse-warning {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
   }
   50% {

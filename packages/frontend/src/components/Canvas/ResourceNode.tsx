@@ -18,7 +18,15 @@ export interface ResourceNodeData {
 }
 
 export function ResourceNode({data}: NodeProps<ResourceNodeData>) {
-  const {label, type, iconPath, isImported, constructPath, customStyle, securityIssues} = data;
+  const {
+    label,
+    type,
+    iconPath,
+    isImported,
+    constructPath,
+    customStyle,
+    securityIssues,
+  } = data;
 
   // Extract service name from type (AWS::Lambda::Function -> Lambda Function)
   const serviceName = type.replace('AWS::', '').replace(/::/g, ' ').trim();
@@ -68,7 +76,10 @@ export function ResourceNode({data}: NodeProps<ResourceNodeData>) {
           </span>
         )}
         {securityIssues && securityIssues > 0 && (
-          <span className="security-badge" title={`${securityIssues} security issue(s)`}>
+          <span
+            className="security-badge"
+            title={`${securityIssues} security issue(s)`}
+          >
             ⚠️ {securityIssues}
           </span>
         )}
@@ -82,7 +93,11 @@ export function ResourceNode({data}: NodeProps<ResourceNodeData>) {
           {serviceName}
         </div>
         {constructPath && (
-          <div className="resource-node-path" title={constructPath} style={labelStyle}>
+          <div
+            className="resource-node-path"
+            title={constructPath}
+            style={labelStyle}
+          >
             {constructPath.split('/').pop()}
           </div>
         )}

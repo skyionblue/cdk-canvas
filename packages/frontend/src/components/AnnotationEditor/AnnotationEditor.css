@@ -164,7 +164,9 @@
 
 .color-swatch.active {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary);
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 4px var(--accent-primary);
 }
 
 .arrow-buttons {

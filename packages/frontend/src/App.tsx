@@ -439,21 +439,24 @@ function AppContent() {
   );
 
   // Handle delete group (only custom groups can be deleted)
-  const handleDeleteGroup = useCallback((groupId: string) => {
-    // Only allow deletion of custom groups
-    const isCustomGroup = customNodes.some(
-      (n) => n.id === groupId && n.type === 'customGroup',
-    );
+  const handleDeleteGroup = useCallback(
+    (groupId: string) => {
+      // Only allow deletion of custom groups
+      const isCustomGroup = customNodes.some(
+        (n) => n.id === groupId && n.type === 'customGroup',
+      );
 
-    if (!isCustomGroup) {
-      alert('System layers (AWS Cloud, VPC, Legend) cannot be deleted.');
-      return;
-    }
+      if (!isCustomGroup) {
+        alert('System layers (AWS Cloud, VPC, Legend) cannot be deleted.');
+        return;
+      }
 
-    if (confirm('Are you sure you want to delete this group?')) {
-      setCustomNodes((prev) => prev.filter((node) => node.id !== groupId));
-    }
-  }, [customNodes]);
+      if (confirm('Are you sure you want to delete this group?')) {
+        setCustomNodes((prev) => prev.filter((node) => node.id !== groupId));
+      }
+    },
+    [customNodes],
+  );
 
   // Handle toggle group visibility
   const handleToggleGroupVisibility = useCallback(
@@ -662,7 +665,9 @@ function AppContent() {
 
   // Handle align nodes
   const handleAlignNodes = useCallback(
-    (alignment: 'left' | 'right' | 'top' | 'bottom' | 'center-h' | 'center-v') => {
+    (
+      alignment: 'left' | 'right' | 'top' | 'bottom' | 'center-h' | 'center-v',
+    ) => {
       const allNodes = reactFlowInstance.getNodes();
       const selectedNodes = allNodes.filter(
         (node) => node.selected && node.type === 'resourceNode',
@@ -672,7 +677,6 @@ function AppContent() {
 
       const nodeWidth = 200;
       const nodeHeight = 140;
-
       let alignValue = 0;
 
       if (alignment === 'left') {
@@ -681,7 +685,9 @@ function AppContent() {
           node.position.x = alignValue;
         });
       } else if (alignment === 'right') {
-        alignValue = Math.max(...selectedNodes.map((n) => n.position.x + nodeWidth));
+        alignValue = Math.max(
+          ...selectedNodes.map((n) => n.position.x + nodeWidth),
+        );
         selectedNodes.forEach((node) => {
           node.position.x = alignValue - nodeWidth;
         });
@@ -691,21 +697,27 @@ function AppContent() {
           node.position.y = alignValue;
         });
       } else if (alignment === 'bottom') {
-        alignValue = Math.max(...selectedNodes.map((n) => n.position.y + nodeHeight));
+        alignValue = Math.max(
+          ...selectedNodes.map((n) => n.position.y + nodeHeight),
+        );
         selectedNodes.forEach((node) => {
           node.position.y = alignValue - nodeHeight;
         });
       } else if (alignment === 'center-h') {
         const avgX =
-          selectedNodes.reduce((sum, n) => sum + n.position.x + nodeWidth / 2, 0) /
-          selectedNodes.length;
+          selectedNodes.reduce(
+            (sum, n) => sum + n.position.x + nodeWidth / 2,
+            0,
+          ) / selectedNodes.length;
         selectedNodes.forEach((node) => {
           node.position.x = avgX - nodeWidth / 2;
         });
       } else if (alignment === 'center-v') {
         const avgY =
-          selectedNodes.reduce((sum, n) => sum + n.position.y + nodeHeight / 2, 0) /
-          selectedNodes.length;
+          selectedNodes.reduce(
+            (sum, n) => sum + n.position.y + nodeHeight / 2,
+            0,
+          ) / selectedNodes.length;
         selectedNodes.forEach((node) => {
           node.position.y = avgY - nodeHeight / 2;
         });
@@ -726,12 +738,14 @@ function AppContent() {
 
       if (selectedNodes.length < 3) return;
 
-      const nodeWidth = 200;
-      const nodeHeight = 140;
+      // const nodeWidth = 200;
+      // const nodeHeight = 140;
 
       if (direction === 'horizontal') {
         // Sort by X position
-        const sorted = [...selectedNodes].sort((a, b) => a.position.x - b.position.x);
+        const sorted = [...selectedNodes].sort(
+          (a, b) => a.position.x - b.position.x,
+        );
         const first = sorted[0];
         const last = sorted[sorted.length - 1];
         const totalSpace = last.position.x - first.position.x;
@@ -742,7 +756,9 @@ function AppContent() {
         });
       } else {
         // Sort by Y position
-        const sorted = [...selectedNodes].sort((a, b) => a.position.y - b.position.y);
+        const sorted = [...selectedNodes].sort(
+          (a, b) => a.position.y - b.position.y,
+        );
         const first = sorted[0];
         const last = sorted[sorted.length - 1];
         const totalSpace = last.position.y - first.position.y;
@@ -820,23 +836,9 @@ function AppContent() {
     [reactFlowInstance],
   );
 
-  // Handle annotation double-click
-  const handleAnnotationDoubleClick = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
-      if (
-        node.type === 'textAnnotation' ||
-        node.type === 'calloutAnnotation' ||
-        node.type === 'highlightBox'
-      ) {
-        setEditingAnnotation(node);
-      }
-    },
-    [],
-  );
-
   // Handle update annotation
   const handleUpdateAnnotation = useCallback(
-    (nodeId: string, updates: Record<string, any>) => {
+    (nodeId: string, updates: Record<string, unknown>) => {
       setAnnotations((prev) =>
         prev.map((node) =>
           node.id === nodeId
@@ -886,28 +888,29 @@ function AppContent() {
     const issuesByResource = groupIssuesByResource(securityIssues);
 
     // Helper function to extract property value (handles strings and CloudFormation intrinsics)
-    const extractPropertyValue = (prop: any): string | null => {
+    const extractPropertyValue = (prop: unknown): string | null => {
       if (typeof prop === 'string') {
         return prop;
       }
       if (prop && typeof prop === 'object') {
+        const obj = prop as Record<string, unknown>;
         // Handle Ref
-        if (prop.Ref) {
-          return `{Ref: ${prop.Ref}}`;
+        if ('Ref' in obj) {
+          return `{Ref: ${obj.Ref}}`;
         }
         // Handle Fn::GetAtt
-        if (prop['Fn::GetAtt']) {
-          const attr = Array.isArray(prop['Fn::GetAtt'])
-            ? prop['Fn::GetAtt'].join('.')
-            : prop['Fn::GetAtt'];
+        if ('Fn::GetAtt' in obj) {
+          const attr = Array.isArray(obj['Fn::GetAtt'])
+            ? (obj['Fn::GetAtt'] as string[]).join('.')
+            : obj['Fn::GetAtt'];
           return `{GetAtt: ${attr}}`;
         }
         // Handle Fn::ImportValue
-        if (prop['Fn::ImportValue']) {
-          return `{Import: ${prop['Fn::ImportValue']}}`;
+        if ('Fn::ImportValue' in obj) {
+          return `{Import: ${obj['Fn::ImportValue']}}`;
         }
         // Handle other intrinsics
-        const keys = Object.keys(prop);
+        const keys = Object.keys(obj);
         if (keys.length > 0) {
           return `{${keys[0]}: ...}`;
         }
@@ -929,7 +932,9 @@ function AppContent() {
         Object.values(stack.resources).forEach((resource) => {
           // Extract VPCs
           if (resource.type === 'AWS::EC2::VPC') {
-            const cidrBlock = extractPropertyValue(resource.properties?.CidrBlock);
+            const cidrBlock = extractPropertyValue(
+              resource.properties?.CidrBlock,
+            );
             if (cidrBlock) {
               cidrBlocks.push({
                 name: resource.id,
@@ -942,7 +947,9 @@ function AppContent() {
 
           // Extract Subnets
           if (resource.type === 'AWS::EC2::Subnet') {
-            const cidrBlock = extractPropertyValue(resource.properties?.CidrBlock);
+            const cidrBlock = extractPropertyValue(
+              resource.properties?.CidrBlock,
+            );
             if (cidrBlock) {
               cidrBlocks.push({
                 name: resource.id,
@@ -975,45 +982,49 @@ function AppContent() {
     });
 
     // Filter out hidden types and apply styling + security issues
-    const filteredNodes = result.nodes.filter((node) => {
-      return !hiddenTypes.has(node.data.type);
-    }).map((node) => {
-      // Get security issue count for this node
-      const nodeIssues = issuesByResource.get(node.id);
-      const securityIssueCount = nodeIssues ? nodeIssues.length : 0;
+    const filteredNodes = result.nodes
+      .filter((node) => {
+        return !hiddenTypes.has(node.data.type);
+      })
+      .map((node) => {
+        // Get security issue count for this node
+        const nodeIssues = issuesByResource.get(node.id);
+        const securityIssueCount = nodeIssues ? nodeIssues.length : 0;
 
-      // Apply type-specific styling
-      const typeStyle = stylingOptions.nodeStylesByType[node.data.type];
-      if (typeStyle && node.type === 'resourceNode') {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            customStyle: {
-              ...node.data.customStyle,
-              ...typeStyle,
-              fontSize: typeStyle.fontSize || stylingOptions.globalFontSize,
+        // Apply type-specific styling
+        const typeStyle = stylingOptions.nodeStylesByType[node.data.type];
+        if (typeStyle && node.type === 'resourceNode') {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              customStyle: {
+                ...node.data.customStyle,
+                ...typeStyle,
+                fontSize: typeStyle.fontSize || stylingOptions.globalFontSize,
+              },
+              securityIssues: securityIssueCount,
             },
-            securityIssues: securityIssueCount,
-          },
-        };
-      }
-      // Apply global font size and security issues
-      if (node.type === 'resourceNode') {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            customStyle: {
-              ...node.data.customStyle,
-              fontSize: node.data.customStyle?.fontSize || stylingOptions.globalFontSize,
+          };
+        }
+        // Apply global font size and security issues
+        if (node.type === 'resourceNode') {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              customStyle: {
+                ...node.data.customStyle,
+                fontSize:
+                  node.data.customStyle?.fontSize ||
+                  stylingOptions.globalFontSize,
+              },
+              securityIssues: securityIssueCount,
             },
-            securityIssues: securityIssueCount,
-          },
-        };
-      }
-      return node;
-    });
+          };
+        }
+        return node;
+      });
 
     // Filter edges to only visible resource nodes
     // Exclude group nodes (VPC, AWS Cloud, Stack groups) from edge computation
@@ -1074,8 +1085,7 @@ function AppContent() {
     );
     const topologyGroups = nodes.filter(
       (node) =>
-        node.type === 'group' &&
-        (node.data?.isCloudBox || node.data?.isVpcBox),
+        node.type === 'group' && (node.data?.isCloudBox || node.data?.isVpcBox),
     );
     const legendNodes = nodes.filter((node) => node.type === 'legendNode');
     return [...customGroups, ...topologyGroups, ...legendNodes];

@@ -13,6 +13,7 @@ import {applyLayout, LayoutMode} from './layout-algorithms';
 export function stackToFlow(
   stack: CdkStack,
   layoutMode: LayoutMode = 'dependency',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _cidrBlocks?: unknown, // For API compatibility, not used in single-stack mode
 ): {
   nodes: Node<ResourceNodeData>[];

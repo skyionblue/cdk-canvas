@@ -10,7 +10,10 @@ export interface TextAnnotationData {
   height?: number;
 }
 
-export function TextAnnotation({data, selected}: NodeProps<TextAnnotationData>) {
+export function TextAnnotation({
+  data,
+  selected,
+}: NodeProps<TextAnnotationData>) {
   const {text, color, fontSize, width = 200, height = 100} = data;
 
   return (
@@ -23,9 +26,7 @@ export function TextAnnotation({data, selected}: NodeProps<TextAnnotationData>) 
         fontSize: `${fontSize}px`,
       }}
     >
-      <div className="annotation-content">
-        {text || 'Double-click to edit'}
-      </div>
+      <div className="annotation-content">{text || 'Double-click to edit'}</div>
       {selected && <div className="resize-handle" />}
     </div>
   );

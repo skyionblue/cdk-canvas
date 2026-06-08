@@ -20,7 +20,9 @@ interface StylingPanelProps {
   selectedNodes: string[];
   stylingOptions: StylingOptions;
   onUpdateStyling: (options: Partial<StylingOptions>) => void;
-  onAlignNodes: (alignment: 'left' | 'right' | 'top' | 'bottom' | 'center-h' | 'center-v') => void;
+  onAlignNodes: (
+    alignment: 'left' | 'right' | 'top' | 'bottom' | 'center-h' | 'center-v',
+  ) => void;
   onDistributeNodes: (direction: 'horizontal' | 'vertical') => void;
   onApplyStyleToSelected: (style: NodeStyle) => void;
 }
@@ -36,7 +38,9 @@ export function StylingPanel({
   onDistributeNodes,
   onApplyStyleToSelected,
 }: StylingPanelProps) {
-  const [activeTab, setActiveTab] = useState<'global' | 'types' | 'alignment'>('global');
+  const [activeTab, setActiveTab] = useState<'global' | 'types' | 'alignment'>(
+    'global',
+  );
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -127,7 +131,10 @@ export function StylingPanel({
                     <div className="color-picker-group">
                       <input
                         type="color"
-                        value={stylingOptions.selectedNodeStyle?.borderColor || '#3b82f6'}
+                        value={
+                          stylingOptions.selectedNodeStyle?.borderColor ||
+                          '#3b82f6'
+                        }
                         onChange={(e) =>
                           onApplyStyleToSelected({borderColor: e.target.value})
                         }
@@ -284,7 +291,9 @@ export function StylingPanel({
             <div className="styling-section">
               <h3>Alignment Tools</h3>
               {selectedNodes.length < 2 ? (
-                <p className="hint">Select 2 or more nodes to use alignment tools</p>
+                <p className="hint">
+                  Select 2 or more nodes to use alignment tools
+                </p>
               ) : (
                 <>
                   <div className="alignment-group">

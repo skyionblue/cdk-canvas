@@ -6,7 +6,9 @@
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-primary);
   box-shadow: var(--shadow-sm);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .toolbar-section {

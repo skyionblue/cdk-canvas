@@ -15,14 +15,20 @@ interface LegendEditorProps {
   onClose: () => void;
 }
 
-export function LegendEditor({legendNode, onUpdate, onClose}: LegendEditorProps) {
+export function LegendEditor({
+  legendNode,
+  onUpdate,
+  onClose,
+}: LegendEditorProps) {
   const [blocks, setBlocks] = useState<CidrInfo[]>(
     legendNode.data.cidrBlocks || [],
   );
 
   const handleNameChange = (index: number, newName: string) => {
     setBlocks((prev) =>
-      prev.map((block, idx) => (idx === index ? {...block, name: newName} : block)),
+      prev.map((block, idx) =>
+        idx === index ? {...block, name: newName} : block,
+      ),
     );
   };
 

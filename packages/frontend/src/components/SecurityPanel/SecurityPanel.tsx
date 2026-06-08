@@ -7,25 +7,27 @@ interface SecurityPanelProps {
   onHighlightResource: (resourceId: string) => void;
 }
 
-export function SecurityPanel({issues, onHighlightResource}: SecurityPanelProps) {
+export function SecurityPanel({
+  issues,
+  onHighlightResource,
+}: SecurityPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selectedSeverity, setSelectedSeverity] = useState<'all' | 'critical' | 'warning'>('all');
+  const [selectedSeverity, setSelectedSeverity] = useState<
+    'all' | 'critical' | 'warning'
+  >('all');
 
   if (issues.length === 0) {
     return null;
   }
 
   const summary = getSecuritySummary(issues);
-  const filteredIssues = selectedSeverity === 'all'
-    ? issues
-    : issues.filter((i) => i.severity === selectedSeverity);
+  const filteredIssues =
+    selectedSeverity === 'all'
+      ? issues
+      : issues.filter((i) => i.severity === selectedSeverity);
 
   const getSeverityIcon = (severity: 'critical' | 'warning') => {
     return severity === 'critical' ? '🔴' : '🟡';
-  };
-
-  const getSeverityColor = (severity: 'critical' | 'warning') => {
-    return severity === 'critical' ? 'var(--accent-danger)' : 'var(--accent-warning)';
   };
 
   return (

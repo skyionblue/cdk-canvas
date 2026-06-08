@@ -81,7 +81,9 @@ export function LayersPanel({
                   <button
                     className="visibility-button"
                     onClick={() => onToggleAnnotationVisibility(annotation.id)}
-                    title={annotation.hidden ? 'Show annotation' : 'Hide annotation'}
+                    title={
+                      annotation.hidden ? 'Show annotation' : 'Hide annotation'
+                    }
                   >
                     {annotation.hidden ? '👁️‍🗨️' : '👁️'}
                   </button>

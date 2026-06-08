@@ -4,7 +4,7 @@ import './AnnotationEditor.css';
 
 interface AnnotationEditorProps {
   annotation: Node | null;
-  onUpdate: (nodeId: string, updates: Record<string, any>) => void;
+  onUpdate: (nodeId: string, updates: Record<string, unknown>) => void;
   onDelete: (nodeId: string) => void;
   onClose: () => void;
 }
@@ -59,7 +59,7 @@ export function AnnotationEditor({
   const annotationType = annotation.type;
 
   const handleSave = () => {
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
 
     if (annotationType === 'textAnnotation') {
       updates.text = text;
@@ -286,7 +286,9 @@ export function AnnotationEditor({
                   value={opacity}
                   onChange={(e) => setOpacity(parseFloat(e.target.value))}
                 />
-                <span className="slider-value">{Math.round(opacity * 100)}%</span>
+                <span className="slider-value">
+                  {Math.round(opacity * 100)}%
+                </span>
               </div>
 
               <div className="form-group">
