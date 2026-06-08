@@ -31,6 +31,10 @@ export function setupLayoutsRoutes(
   app.get('/api/layouts/:layoutName', (req, res) => {
     try {
       const layoutName = req.params.layoutName;
+      if (!/^[\w-]+$/.test(layoutName)) {
+        res.status(400).json({error: 'Invalid layout name'});
+        return;
+      }
       const layout = loadLayout(layoutsPath, layoutName);
       res.json(layout);
     } catch (error) {
@@ -44,6 +48,10 @@ export function setupLayoutsRoutes(
   app.post('/api/layouts/:layoutName', (req, res) => {
     try {
       const layoutName = req.params.layoutName;
+      if (!/^[\w-]+$/.test(layoutName)) {
+        res.status(400).json({error: 'Invalid layout name'});
+        return;
+      }
       saveLayout(layoutsPath, layoutName, req.body);
       res.json({success: true});
     } catch (error) {
@@ -57,6 +65,10 @@ export function setupLayoutsRoutes(
   app.delete('/api/layouts/:layoutName', (req, res) => {
     try {
       const layoutName = req.params.layoutName;
+      if (!/^[\w-]+$/.test(layoutName)) {
+        res.status(400).json({error: 'Invalid layout name'});
+        return;
+      }
       deleteLayout(layoutsPath, layoutName);
       res.json({success: true});
     } catch (error) {

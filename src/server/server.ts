@@ -16,12 +16,11 @@ export function startServer(port: number, cdkOutPath: string): void {
   app.use(cors());
   app.use(express.json());
 
-  // Serve assets (AWS icons, logos) - from package root
+  // assets/ sits next to dist/ at the package root
   const assetsPath = path.join(__dirname, '../../assets');
   app.use('/assets', express.static(assetsPath));
 
-  // Serve frontend
-  const frontendPath = path.join(__dirname, '../');
+  const frontendPath = path.join(__dirname, '../public');
   app.use(express.static(frontendPath));
 
   setupStacksRoutes(app, cdkOutPath);

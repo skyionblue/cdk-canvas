@@ -45,12 +45,12 @@ export interface CdkResource {
   /**
    * Stack name (for multi-stack diagrams).
    */
-  stackName?: string;
+  readonly stackName?: string;
 
   /**
    * Original resource ID before stack prefixing.
    */
-  originalId?: string;
+  readonly originalId?: string;
 }
 
 /**

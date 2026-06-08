@@ -21,6 +21,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"],
+  "include": ["src/frontend"],
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "node_modules"]
 }

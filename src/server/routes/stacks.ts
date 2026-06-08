@@ -29,6 +29,10 @@ export function setupStacksRoutes(
   app.get('/api/stacks/:stackName', (req, res) => {
     try {
       const stackName = req.params.stackName;
+      if (!/^[\w-]+$/.test(stackName)) {
+        res.status(400).json({error: 'Invalid stack name'});
+        return;
+      }
       const template = loadStackTemplate(cdkOutPath, stackName);
       const parsedStack = parseStack(stackName, template);
       res.json(parsedStack);

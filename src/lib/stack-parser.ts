@@ -24,9 +24,7 @@ export function parseStack(
   const dependencies = extractDependencies(template.Resources);
   const importedResourceIds = detectImportedResources(template);
 
-  // Parse each resource (skip CDKMetadata)
   for (const [logicalId, resource] of Object.entries(template.Resources)) {
-    // Skip CDKMetadata resources
     if (resource.Type === 'AWS::CDK::Metadata') {
       continue;
     }
@@ -39,7 +37,6 @@ export function parseStack(
     );
   }
 
-  // Parse outputs
   const outputs: Record<string, CdkOutput> = {};
   if (template.Outputs) {
     for (const [outputId, output] of Object.entries(template.Outputs)) {
@@ -100,7 +97,6 @@ function extractDependencies(
   for (const [logicalId, resource] of Object.entries(resources)) {
     const deps = new Set<string>();
 
-    // Add explicit DependsOn
     if (resource.DependsOn) {
       const dependsOn = Array.isArray(resource.DependsOn)
         ? resource.DependsOn
@@ -108,7 +104,6 @@ function extractDependencies(
       dependsOn.forEach((dep) => deps.add(dep));
     }
 
-    // Scan properties for Ref and Fn::GetAtt
     if (resource.Properties) {
       findReferences(resource.Properties, deps);
     }
@@ -141,7 +136,6 @@ function findReferences(obj: unknown, deps: Set<string>): void {
 
   const record = obj as Record<string, unknown>;
 
-  // Check for Ref
   if ('Ref' in record && typeof record.Ref === 'string') {
     // Only add if it's not a pseudo parameter (AWS::*)
     if (!record.Ref.startsWith('AWS::')) {
@@ -150,7 +144,6 @@ function findReferences(obj: unknown, deps: Set<string>): void {
     return;
   }
 
-  // Check for Fn::GetAtt
   if ('Fn::GetAtt' in record) {
     const getAtt = record['Fn::GetAtt'];
     if (Array.isArray(getAtt) && getAtt.length > 0) {
@@ -162,7 +155,6 @@ function findReferences(obj: unknown, deps: Set<string>): void {
     return;
   }
 
-  // Recursively search nested objects
   for (const value of Object.values(record)) {
     findReferences(value, deps);
   }

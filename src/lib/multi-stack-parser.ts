@@ -7,17 +7,17 @@ export interface MergedStack {
   /**
    * Stack names that were merged.
    */
-  stackNames: string[];
+  readonly stackNames: string[];
 
   /**
    * All resources from all stacks, with stack prefix added to avoid conflicts.
    */
-  resources: Record<string, CdkResource>;
+  readonly resources: Record<string, CdkResource>;
 
   /**
    * Map of prefixed resource ID to original stack name.
    */
-  resourceToStack: Record<string, string>;
+  readonly resourceToStack: Record<string, string>;
 }
 
 /**

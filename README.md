@@ -206,17 +206,20 @@ You can switch modes anytime - your custom positioning is preserved.
 #### 3. Customize Your Diagram
 
 **Reposition Resources:**
+
 - Click and drag any resource node
 - Multi-select: Hold Shift + Click or draw a selection box
 - Press `F` to fit all nodes in view
 
 **Create Groups:**
+
 - Select 2+ nodes
 - Click **📦 Group** in toolbar
 - Enter label and choose color (6 options)
 - Drag group boundary to reposition
 
 **Add Annotations:**
+
 - Click **📝 Annotate** in toolbar
 - Choose type:
   - **📄 Text Note** - Sticky note for explanations
@@ -226,11 +229,13 @@ You can switch modes anytime - your custom positioning is preserved.
 - Double-click to edit text, color, size
 
 **Connect Resources:**
+
 - Drag from any node's edge handle (4 sides)
 - Connect to another resource
 - Click the edge to edit color, thickness, style
 
 **Edit Any Element:**
+
 - Double-click any resource → Opens Node Inspector
 - Double-click any annotation → Opens Annotation Editor
 - Click any edge → Opens Edge Editor
@@ -240,15 +245,18 @@ You can switch modes anytime - your custom positioning is preserved.
 Click **🎨 Styling** to open the styling panel with three tabs:
 
 **Global Tab:**
+
 - Adjust global font size (10-24px)
 - Style selected nodes (border, background, font size)
 
 **By Type Tab:**
+
 - Select a resource type (e.g., AWS::Lambda::Function)
 - Customize color for ALL resources of that type
 - Great for color-coding by service
 
 **Alignment Tab:**
+
 - Select 2+ nodes
 - Use alignment tools (Left, Right, Top, Bottom, Center)
 - Use distribute tools (Horizontal, Vertical spacing)
@@ -261,6 +269,7 @@ The **📚 Layers** panel (bottom-right) shows all elements:
 - **Groups section** - Custom groups, AWS Cloud, VPC boxes
 
 For each layer:
+
 - **👁️** - Toggle visibility
 - **✏️** - Edit properties
 - **🗑️** - Delete (custom elements only)
@@ -301,44 +310,50 @@ Layouts are version-control friendly JSON files.
 
 ### Keyboard Shortcuts
 
-| Action           | Shortcut                |
-|------------------|-------------------------|
-| Fit to view      | `F`                     |
-| Save layout      | `Cmd/Ctrl + S`          |
-| Multi-select     | `Shift + Click`         |
-| Box select       | Click + drag on canvas  |
-| Delete element   | `Delete` or `Backspace` |
-| Deselect all     | Click empty canvas      |
+| Action         | Shortcut                |
+| -------------- | ----------------------- |
+| Fit to view    | `F`                     |
+| Save layout    | `Cmd/Ctrl + S`          |
+| Multi-select   | `Shift + Click`         |
+| Box select     | Click + drag on canvas  |
+| Delete element | `Delete` or `Backspace` |
+| Deselect all   | Click empty canvas      |
 
 ### Tips & Tricks
 
 **Quick Multi-Select:**
+
 - Click and drag on empty canvas to draw selection box
 - Hold Shift and click multiple nodes
 - Release Shift to move all selected nodes together
 
 **Faster Grouping:**
+
 - Select nodes first, then click Group
 - The group boundary auto-calculates from selection
 - Resize by dragging group corners
 
 **Clean Layouts:**
+
 - Use alignment tools for professional look
 - Group related resources by color
 - Hide less important resources with Filter dropdown
 
 **Annotation Best Practices:**
+
 - Use Text Notes for detailed documentation
 - Use Callouts to point out specific resources
 - Use Highlight Boxes to emphasize entire regions
 - Choose colors that contrast with your theme (light/dark)
 
 **Theme Switching:**
+
 - Click **🌙 Dark** for dark mode (easier on eyes)
 - Click **☀️ Light** for light mode (better for printing)
 - Exports use light background by default
 
 **Resource Filtering:**
+
 - Click **🔍 Filter (12/12)** to hide resource types
 - Great for simplifying complex diagrams
 - Topology mode auto-hides plumbing resources
@@ -493,6 +508,7 @@ my-cdk-project/
 The `scripts/` directory is an optional location for automation scripts related to CDK-Canvas. Common use cases:
 
 **Example automation script** (`scripts/generate-diagrams.sh`):
+
 ```bash
 #!/bin/bash
 # Automatically generate and export diagrams after CDK synth
@@ -509,6 +525,7 @@ echo "Diagrams generated in exports/"
 ```
 
 **CI/CD Integration** (`scripts/update-diagrams.sh`):
+
 ```bash
 #!/bin/bash
 # Update diagrams when infrastructure changes
@@ -522,6 +539,7 @@ fi
 ```
 
 **Tip:** Add scripts to your package.json:
+
 ```json
 {
   "scripts": {

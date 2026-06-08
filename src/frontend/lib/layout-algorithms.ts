@@ -42,20 +42,16 @@ function dependencyLayout(nodes: Node[], edges: Edge[]): Node[] {
   g.setGraph({rankdir: 'TB', ranksep: 100, nodesep: 80});
   g.setDefaultEdgeLabel(() => ({}));
 
-  // Add nodes to graph
   nodes.forEach((node) => {
     g.setNode(node.id, {width: NODE_WIDTH, height: NODE_HEIGHT});
   });
 
-  // Add edges to graph
   edges.forEach((edge) => {
     g.setEdge(edge.source, edge.target);
   });
 
-  // Run dagre layout
   dagre.layout(g);
 
-  // Apply positions from dagre
   return nodes.map((node) => {
     const nodeWithPosition = g.node(node.id);
     return {
@@ -75,7 +71,6 @@ function dependencyLayout(nodes: Node[], edges: Edge[]): Node[] {
 function topologyLayout(nodes: Node[], resources: CdkResource[]): Node[] {
   const resourceMap = new Map(resources.map((r) => [r.id, r]));
 
-  // Categorize resources
   const vpcs: Node[] = [];
   const subnets: Node[] = [];
   const others: Node[] = [];
@@ -99,7 +94,6 @@ function topologyLayout(nodes: Node[], resources: CdkResource[]): Node[] {
   const positioned: Node[] = [];
   let currentY = 0;
 
-  // VPCs at top
   vpcs.forEach((node, index) => {
     positioned.push({
       ...node,
@@ -108,7 +102,6 @@ function topologyLayout(nodes: Node[], resources: CdkResource[]): Node[] {
   });
   if (vpcs.length > 0) currentY += 200;
 
-  // Subnets below VPCs
   subnets.forEach((node, index) => {
     positioned.push({
       ...node,
@@ -120,7 +113,6 @@ function topologyLayout(nodes: Node[], resources: CdkResource[]): Node[] {
   });
   if (subnets.length > 0) currentY += Math.ceil(subnets.length / 4) * 180 + 50;
 
-  // Other resources below
   others.forEach((node, index) => {
     positioned.push({
       ...node,
@@ -141,14 +133,13 @@ function topologyLayout(nodes: Node[], resources: CdkResource[]): Node[] {
 function typeLayout(nodes: Node[], resources: CdkResource[]): Node[] {
   const resourceMap = new Map(resources.map((r) => [r.id, r]));
 
-  // Group by service (AWS::Lambda, AWS::DynamoDB, etc.)
   const groups = new Map<string, Node[]>();
 
   nodes.forEach((node) => {
     const resource = resourceMap.get(node.id);
     if (!resource) return;
 
-    // Extract service from type (AWS::Lambda::Function -> Lambda)
+    // AWS::Lambda::Function -> Lambda
     const parts = resource.type.split('::');
     const service = parts.length >= 2 ? parts[1] : 'Other';
 
@@ -158,7 +149,6 @@ function typeLayout(nodes: Node[], resources: CdkResource[]): Node[] {
     groups.get(service)!.push(node);
   });
 
-  // Sort groups by name
   const sortedGroups = Array.from(groups.entries()).sort((a, b) =>
     a[0].localeCompare(b[0]),
   );
@@ -168,7 +158,6 @@ function typeLayout(nodes: Node[], resources: CdkResource[]): Node[] {
 
   sortedGroups.forEach((group) => {
     const groupNodes = group[1];
-    // Add label node for group (optional, could be rendered differently)
     groupNodes.forEach((node, index) => {
       positioned.push({
         ...node,
@@ -179,7 +168,6 @@ function typeLayout(nodes: Node[], resources: CdkResource[]): Node[] {
       });
     });
 
-    // Move to next group
     currentY += Math.ceil(groupNodes.length / 4) * 180 + 80;
   });
 
