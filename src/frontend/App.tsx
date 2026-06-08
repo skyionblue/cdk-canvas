@@ -8,6 +8,7 @@ import {
   Node,
 } from 'reactflow';
 import {toPng} from 'html-to-image';
+import {exportToDrawio} from './lib/drawio-export';
 import {Canvas} from './components/Canvas';
 import {Sidebar} from './components/Sidebar';
 import {Toolbar} from './components/Toolbar';
@@ -1209,6 +1210,30 @@ function AppContent() {
       if (selectedStacks.length === 0) return;
 
       try {
+        if (options.format === 'drawio') {
+          const allNodes = reactFlowInstance.getNodes();
+          const allEdges = reactFlowInstance.getEdges();
+          const diagramName =
+            options.title ||
+            (selectedStacks.length === 1
+              ? selectedStacks[0]
+              : 'Multi-Stack Diagram');
+          const fileName =
+            selectedStacks.length === 1
+              ? `${selectedStacks[0]}-diagram.drawio`
+              : 'multi-stack-diagram.drawio';
+          const xml = await exportToDrawio(allNodes, allEdges, diagramName);
+          const blob = new Blob([xml], {type: 'application/xml'});
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+          alert('Diagram exported successfully!');
+          return;
+        }
+
         const nodesBounds = getNodesBounds(reactFlowInstance.getNodes());
         const viewport = getViewportForBounds(
           nodesBounds,

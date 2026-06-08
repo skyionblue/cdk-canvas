@@ -7,7 +7,7 @@ interface ExportDialogProps {
 }
 
 export interface ExportOptions {
-  format: 'png' | 'svg';
+  format: 'png' | 'svg' | 'drawio';
   title?: string;
   footer?: string;
   includeBranding: boolean;
@@ -17,7 +17,7 @@ export interface ExportOptions {
 }
 
 export function ExportDialog({onExport, onClose}: ExportDialogProps) {
-  const [format, setFormat] = useState<'png' | 'svg'>('png');
+  const [format, setFormat] = useState<'png' | 'svg' | 'drawio'>('png');
   const [title, setTitle] = useState('');
   const [footer, setFooter] = useState('');
   const [includeBranding, setIncludeBranding] = useState(true);
@@ -75,107 +75,136 @@ export function ExportDialog({onExport, onClose}: ExportDialogProps) {
               >
                 📐 SVG
               </button>
+              <button
+                className={`format-button ${format === 'drawio' ? 'selected' : ''}`}
+                onClick={() => setFormat('drawio')}
+              >
+                ✏️ Draw.io
+              </button>
             </div>
           </div>
 
+          {format === 'drawio' && (
+            <p className="helper-text">
+              Exports a .drawio file that can be opened and edited in{' '}
+              <strong>draw.io</strong> or <strong>diagrams.net</strong>. All
+              nodes, groups, and connections are preserved with their current
+              positions.
+            </p>
+          )}
+
           <div className="form-group">
-            <label htmlFor="export-title">Title (optional)</label>
+            <label htmlFor="export-title">
+              {format === 'drawio'
+                ? 'Diagram name (optional)'
+                : 'Title (optional)'}
+            </label>
             <input
               id="export-title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Production Infrastructure"
+              placeholder={
+                format === 'drawio'
+                  ? 'e.g., Production Infrastructure'
+                  : 'e.g., Production Infrastructure'
+              }
               maxLength={80}
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="export-footer">Footer (optional)</label>
-            <input
-              id="export-footer"
-              type="text"
-              value={footer}
-              onChange={(e) => setFooter(e.target.value)}
-              placeholder="e.g., Last updated: 2026-06-07"
-              maxLength={80}
-            />
-          </div>
+          {format !== 'drawio' && (
+            <>
+              <div className="form-group">
+                <label htmlFor="export-footer">Footer (optional)</label>
+                <input
+                  id="export-footer"
+                  type="text"
+                  value={footer}
+                  onChange={(e) => setFooter(e.target.value)}
+                  placeholder="e.g., Last updated: 2026-06-07"
+                  maxLength={80}
+                />
+              </div>
 
-          <div className="form-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={includeBranding}
-                onChange={(e) => setIncludeBranding(e.target.checked)}
-              />
-              <span>Include logo</span>
-            </label>
-          </div>
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={includeBranding}
+                    onChange={(e) => setIncludeBranding(e.target.checked)}
+                  />
+                  <span>Include logo</span>
+                </label>
+              </div>
 
-          {includeBranding && (
-            <div className="form-group">
-              <label htmlFor="logo-upload">
-                Custom Logo (optional - PNG/SVG/JPG)
-              </label>
-              <input
-                id="logo-upload"
-                type="file"
-                accept="image/png,image/jpeg,image/svg+xml"
-                onChange={handleLogoUpload}
-                className="file-input"
-              />
-              {logoUrl && (
-                <div className="logo-preview">
-                  <img src={logoUrl} alt="Logo preview" />
-                  <button
-                    className="remove-logo"
-                    onClick={() => setLogoUrl('')}
-                    type="button"
-                  >
-                    Remove
-                  </button>
+              {includeBranding && (
+                <div className="form-group">
+                  <label htmlFor="logo-upload">
+                    Custom Logo (optional - PNG/SVG/JPG)
+                  </label>
+                  <input
+                    id="logo-upload"
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml"
+                    onChange={handleLogoUpload}
+                    className="file-input"
+                  />
+                  {logoUrl && (
+                    <div className="logo-preview">
+                      <img src={logoUrl} alt="Logo preview" />
+                      <button
+                        className="remove-logo"
+                        onClick={() => setLogoUrl('')}
+                        type="button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  {!logoUrl && (
+                    <p className="helper-text">
+                      If no logo is uploaded, TrueMark default will be used
+                    </p>
+                  )}
                 </div>
               )}
-              {!logoUrl && (
-                <p className="helper-text">
-                  If no logo is uploaded, TrueMark default will be used
-                </p>
-              )}
-            </div>
-          )}
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="export-width">Width (px)</label>
-              <input
-                id="export-width"
-                type="number"
-                value={width}
-                onChange={(e) => setWidth(parseInt(e.target.value) || 1920)}
-                min="800"
-                max="4096"
-                step="100"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="export-height">Height (px)</label>
-              <input
-                id="export-height"
-                type="number"
-                value={height}
-                onChange={(e) => setHeight(parseInt(e.target.value) || 1080)}
-                min="600"
-                max="4096"
-                step="100"
-              />
-            </div>
-          </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="export-width">Width (px)</label>
+                  <input
+                    id="export-width"
+                    type="number"
+                    value={width}
+                    onChange={(e) => setWidth(parseInt(e.target.value) || 1920)}
+                    min="800"
+                    max="4096"
+                    step="100"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="export-height">Height (px)</label>
+                  <input
+                    id="export-height"
+                    type="number"
+                    value={height}
+                    onChange={(e) =>
+                      setHeight(parseInt(e.target.value) || 1080)
+                    }
+                    min="600"
+                    max="4096"
+                    step="100"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="export-dialog-actions">
           <button className="export-button" onClick={handleExport}>
-            Export {format.toUpperCase()}
+            Export {format === 'drawio' ? 'Draw.io' : format.toUpperCase()}
           </button>
           <button className="cancel-button" onClick={onClose}>
             Cancel
