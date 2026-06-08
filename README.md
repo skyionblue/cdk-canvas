@@ -600,38 +600,45 @@ pnpm run build
 
 ```
 cdk-canvas/
-├── packages/
-│   ├── cdk-canvas/        # Main package (backend + CLI)
-│   │   ├── bin/           # CLI entry point
-│   │   ├── dist/          # Built frontend assets
-│   │   └── src/           # Server code
-│   └── frontend/          # React application
-│       ├── src/
-│       │   ├── components/
-│       │   ├── lib/
-│       │   └── types/
-│       └── vite.config.ts
-├── logos-icons/           # Source assets
-└── package.json           # Root workspace
+├── bin/                   # CLI entry point
+├── src/
+│   ├── cli/               # CLI argument parsing
+│   ├── lib/               # Stack parsing, icon mapping, multi-stack merging
+│   ├── server/            # Express server and API routes
+│   └── frontend/          # React application (bundled by Vite)
+│       ├── components/
+│       ├── contexts/
+│       ├── lib/
+│       └── types/
+├── assets/                # AWS architecture icons
+├── dist/                  # Compiled output (generated)
+│   ├── public/            # Bundled frontend (Vite output)
+│   └── ...                # Compiled server/CLI JS
+├── docs/                  # Project documentation
+├── vite.config.ts         # Vite config (frontend build)
+├── tsconfig.json          # TypeScript config (server/CLI)
+└── tsconfig.frontend.json # TypeScript config (frontend, used by Vite)
 ```
 
 ### Running Locally
 
-**Terminal 1 - Frontend (hot reload):**
+**Terminal 1 - Frontend (hot reload at http://localhost:5173):**
 
 ```bash
-cd packages/frontend
-pnpm run dev
+pnpm run dev:frontend
 ```
 
-**Terminal 2 - Backend:**
+**Terminal 2 - Backend (watch mode):**
 
 ```bash
-cd packages/cdk-canvas
-npx ts-node src/cli/index.ts --cdk-out /path/to/cdk.out
+pnpm run dev:server
 ```
 
-Open http://localhost:3000 (or the Vite dev server port).
+Then point the frontend dev server's API calls at your backend by running `cdk synth` in a CDK project and launching:
+
+```bash
+node bin/cdk-canvas.js --cdk-out /path/to/cdk.out
+```
 
 ---
 
