@@ -1,6 +1,6 @@
 {
   "name": "@skyionblue/cdk-canvas",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Interactive CDK diagram designer - CLI and server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
