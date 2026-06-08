@@ -1,0 +1,94 @@
+.cidr-legend {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 1000;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cidr-legend-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 12px 12px 0 0;
+}
+
+.cidr-legend-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.cidr-legend-content {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cidr-section {
+  margin-bottom: 16px;
+}
+
+.cidr-section:last-child {
+  margin-bottom: 0;
+}
+
+.cidr-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.cidr-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+
+.cidr-entry:hover {
+  background: #f1f5f9;
+}
+
+.cidr-color-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid #cbd5e1;
+  flex-shrink: 0;
+}
+
+.cidr-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cidr-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cidr-block {
+  font-size: 11px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #64748b;
+  margin-top: 2px;
+}

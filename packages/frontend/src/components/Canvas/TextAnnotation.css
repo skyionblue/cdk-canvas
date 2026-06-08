@@ -1,0 +1,51 @@
+.text-annotation {
+  background-color: #fff59d;
+  border: 2px solid #f9a825;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: var(--shadow-md);
+  cursor: move;
+  position: relative;
+  transition: all 0.2s ease;
+  font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.text-annotation.selected {
+  border-color: var(--accent-primary);
+  border-width: 3px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), var(--shadow-lg);
+}
+
+.text-annotation:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.annotation-content {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  color: #3e2723;
+  line-height: 1.4;
+  min-height: 40px;
+}
+
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--accent-primary);
+  border-radius: 2px 0 6px 0;
+  cursor: nwse-resize;
+}
+
+/* Dark theme adjustments */
+[data-theme='dark'] .text-annotation {
+  background-color: #f9a825;
+  border-color: #fbc02d;
+}
+
+[data-theme='dark'] .annotation-content {
+  color: #1a1a1a;
+}

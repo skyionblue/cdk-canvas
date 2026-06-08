@@ -1,0 +1,140 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border-primary);
+  transition: background-color 0.2s ease;
+}
+
+.button-group {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-tertiary);
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--button-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.toolbar-button:hover:not(:disabled) {
+  background: var(--button-bg-hover);
+}
+
+.toolbar-button.active {
+  background: var(--button-bg-active);
+  color: var(--button-text-active);
+  border-color: var(--button-bg-active);
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbar-button.active:hover {
+  background: var(--accent-primary);
+  filter: brightness(0.9);
+}
+
+.toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.toolbar-button.connect-mode {
+  background: var(--accent-success);
+  color: white;
+  border-color: var(--accent-success);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.6);
+  }
+}
+
+.annotation-menu-container {
+  position: relative;
+}
+
+.annotation-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.annotation-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.annotation-menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.annotation-menu-item:active {
+  background: var(--accent-primary);
+  color: white;
+}

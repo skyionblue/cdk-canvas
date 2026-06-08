@@ -1,0 +1,46 @@
+.highlight-box {
+  border: 3px dashed;
+  border-radius: 12px;
+  position: relative;
+  cursor: move;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 235, 59, 0.2);
+  border-color: #fbc02d;
+}
+
+.highlight-box.selected {
+  border-style: solid;
+  border-width: 4px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.highlight-box:hover {
+  opacity: 1 !important;
+  transform: scale(1.01);
+}
+
+.highlight-label {
+  position: absolute;
+  top: -30px;
+  left: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 12px;
+  background: var(--bg-primary);
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.highlight-box .resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-primary);
+  border-radius: 3px 0 9px 0;
+  cursor: nwse-resize;
+  box-shadow: var(--shadow-sm);
+}

@@ -1,0 +1,189 @@
+.legend-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.legend-editor {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.legend-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.legend-editor-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background: #f1f5f9;
+}
+
+.legend-editor-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.legend-editor-instructions {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.legend-editor-section {
+  margin-bottom: 24px;
+}
+
+.legend-editor-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.legend-editor-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.legend-editor-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legend-editor-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend-editor-fields input {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.legend-editor-fields input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.legend-editor-cidr {
+  font-size: 12px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.legend-editor-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.save-button,
+.cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+}
+
+.save-button {
+  background: #3b82f6;
+  color: white;
+}
+
+.save-button:hover {
+  background: #2563eb;
+}
+
+.save-button:active {
+  transform: scale(0.98);
+}
+
+.cancel-button {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.cancel-button:hover {
+  background: #e2e8f0;
+}
+
+.cancel-button:active {
+  transform: scale(0.98);
+}
