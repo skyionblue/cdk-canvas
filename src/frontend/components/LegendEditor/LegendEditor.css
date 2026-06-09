@@ -127,18 +127,54 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.legend-editor-cidr {
-  font-size: 12px;
+.legend-editor-cidr-input {
   font-family: 'Monaco', 'Courier New', monospace;
-  color: #64748b;
-  font-weight: 500;
+  font-size: 13px;
+  color: #334155;
 }
 
-.empty-state {
-  padding: 40px;
-  text-align: center;
+.delete-entry-button {
+  background: none;
+  border: none;
+  cursor: pointer;
   color: #94a3b8;
-  font-style: italic;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
+}
+
+.delete-entry-button:hover {
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.add-entry-button {
+  background: none;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  margin-top: 4px;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    background-color 0.2s;
+}
+
+.add-entry-button:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
 }
 
 .legend-editor-actions {

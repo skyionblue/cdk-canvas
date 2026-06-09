@@ -1,7 +1,6 @@
 import {Node, Edge} from 'reactflow';
-import dagre from 'dagre';
 import {CdkStack} from '../types';
-import {LayoutMode} from './layout-algorithms';
+import {LayoutMode, applyStaircaseLayout} from './layout-algorithms';
 import {createTopologyLayout} from './topology-layout';
 
 /**
@@ -147,8 +146,8 @@ export function multiStackToFlow(
     // Topology mode: unified AWS Cloud → VPC diagram
     return createTopologyLayout(stacks, nodes, edges, cidrBlocks);
   } else if (layoutMode === 'dependency') {
-    // Dependency mode: hierarchical with stack groups
-    applyDagreLayout(nodes, edges);
+    // Dependency mode: staircase layout with stack groups
+    applyStaircaseLayout(nodes, edges);
     const stackGroups = createStackGroups(nodes, merged.stackNames);
     return {nodes: [...stackGroups, ...nodes], edges};
   } else if (layoutMode === 'type') {
@@ -157,8 +156,8 @@ export function multiStackToFlow(
     const stackGroups = createStackGroups(nodes, merged.stackNames);
     return {nodes: [...stackGroups, ...nodes], edges};
   } else {
-    // Default: dependency layout with groups
-    applyDagreLayout(nodes, edges);
+    // Default: staircase layout with groups
+    applyStaircaseLayout(nodes, edges);
     const stackGroups = createStackGroups(nodes, merged.stackNames);
     return {nodes: [...stackGroups, ...nodes], edges};
   }
@@ -241,36 +240,6 @@ function createStackGroups(
   });
 
   return groups;
-}
-
-/**
- * Apply dagre hierarchical layout.
- */
-function applyDagreLayout(nodes: Node[], edges: Edge[]): void {
-  const g = new dagre.graphlib.Graph();
-  g.setGraph({rankdir: 'TB', ranksep: 100, nodesep: 80});
-  g.setDefaultEdgeLabel(() => ({}));
-
-  const nodeWidth = 180;
-  const nodeHeight = 80;
-
-  nodes.forEach((node) => {
-    g.setNode(node.id, {width: nodeWidth, height: nodeHeight});
-  });
-
-  edges.forEach((edge) => {
-    g.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(g);
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = g.node(node.id);
-    node.position = {
-      x: nodeWithPosition.x - nodeWidth / 2,
-      y: nodeWithPosition.y - nodeHeight / 2,
-    };
-  });
 }
 
 /**

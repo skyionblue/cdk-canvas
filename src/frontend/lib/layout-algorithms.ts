@@ -1,4 +1,3 @@
-import dagre from 'dagre';
 import {Node, Edge} from 'reactflow';
 import {CdkResource} from '../types';
 
@@ -34,31 +33,106 @@ export function applyLayout(
 }
 
 /**
- * Hierarchical dependency layout using dagre.
- * Shows what depends on what in a top-to-bottom flow.
+ * Mutating wrapper around dependencyLayout for callers that manage node arrays
+ * by reference (e.g. multi-stack-to-flow).
+ */
+export function applyStaircaseLayout(nodes: Node[], edges: Edge[]): void {
+  const laid = dependencyLayout(nodes, edges);
+  const posMap = new Map(laid.map((n) => [n.id, n.position]));
+  nodes.forEach((node) => {
+    const pos = posMap.get(node.id);
+    if (pos) node.position = pos;
+  });
+}
+
+/**
+ * Staircase dependency layout.
+ * Computes each node's rank via longest-path from roots, then cascades each
+ * rank diagonally — one column to the right and one step down per rank.
+ * Nodes at the same rank stack vertically within their column.
  */
 function dependencyLayout(nodes: Node[], edges: Edge[]): Node[] {
-  const g = new dagre.graphlib.Graph();
-  g.setGraph({rankdir: 'TB', ranksep: 100, nodesep: 80});
-  g.setDefaultEdgeLabel(() => ({}));
+  if (nodes.length === 0) return nodes;
 
-  nodes.forEach((node) => {
-    g.setNode(node.id, {width: NODE_WIDTH, height: NODE_HEIGHT});
-  });
+  const outgoing = new Map<string, string[]>();
+  const inDegree = new Map<string, number>();
 
-  edges.forEach((edge) => {
-    g.setEdge(edge.source, edge.target);
-  });
+  for (const node of nodes) {
+    outgoing.set(node.id, []);
+    inDegree.set(node.id, 0);
+  }
 
-  dagre.layout(g);
+  for (const edge of edges) {
+    outgoing.get(edge.source)?.push(edge.target);
+    inDegree.set(edge.target, (inDegree.get(edge.target) ?? 0) + 1);
+  }
+
+  // Kahn's topological sort
+  const inDegCopy = new Map(inDegree);
+  const topoOrder: string[] = [];
+  const queue: string[] = nodes
+    .filter((n) => (inDegCopy.get(n.id) ?? 0) === 0)
+    .map((n) => n.id);
+  let qi = 0;
+  while (qi < queue.length) {
+    const id = queue[qi++];
+    topoOrder.push(id);
+    for (const neighbor of outgoing.get(id) ?? []) {
+      const d = (inDegCopy.get(neighbor) ?? 1) - 1;
+      inDegCopy.set(neighbor, d);
+      if (d === 0) queue.push(neighbor);
+    }
+  }
+  // Append cycle-involved or disconnected nodes that were skipped
+  for (const node of nodes) {
+    if (!topoOrder.includes(node.id)) topoOrder.push(node.id);
+  }
+
+  // Longest-path DP: rank = furthest distance from any root
+  const rank = new Map<string, number>(nodes.map((n) => [n.id, 0]));
+  for (const id of topoOrder) {
+    const r = rank.get(id) ?? 0;
+    for (const neighbor of outgoing.get(id) ?? []) {
+      if (r + 1 > (rank.get(neighbor) ?? 0)) {
+        rank.set(neighbor, r + 1);
+      }
+    }
+  }
+
+  // Group nodes by rank, preserving stable insertion order
+  const rankGroups = new Map<number, Node[]>();
+  for (const node of nodes) {
+    const r = rank.get(node.id) ?? 0;
+    if (!rankGroups.has(r)) rankGroups.set(r, []);
+    rankGroups.get(r)!.push(node);
+  }
+
+  const H_GAP = 80; // horizontal gap between rank columns
+  const STAIR_STEP = 80; // minimum vertical drop from one rank's bottom to the next's top
+  const WITHIN_GAP = 30; // vertical gap between nodes stacked within the same rank
+
+  // Compute each rank's y origin, guaranteeing STAIR_STEP clearance below the
+  // previous rank's last node so columns never overlap.
+  const sortedRanks = Array.from(rankGroups.keys()).sort((a, b) => a - b);
+  const rankYStart = new Map<number, number>();
+  let prevBottom = 0;
+
+  for (const r of sortedRanks) {
+    const yStart = r === 0 ? 0 : prevBottom + STAIR_STEP;
+    rankYStart.set(r, yStart);
+    const count = (rankGroups.get(r) ?? []).length;
+    prevBottom = yStart + count * (NODE_HEIGHT + WITHIN_GAP) - WITHIN_GAP;
+  }
 
   return nodes.map((node) => {
-    const nodeWithPosition = g.node(node.id);
+    const r = rank.get(node.id) ?? 0;
+    const rankNodes = rankGroups.get(r) ?? [];
+    const i = rankNodes.indexOf(node);
     return {
       ...node,
       position: {
-        x: nodeWithPosition.x - NODE_WIDTH / 2,
-        y: nodeWithPosition.y - NODE_HEIGHT / 2,
+        x: r * (NODE_WIDTH + H_GAP),
+        y: (rankYStart.get(r) ?? 0) + i * (NODE_HEIGHT + WITHIN_GAP),
       },
     };
   });

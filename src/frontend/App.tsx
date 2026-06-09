@@ -39,6 +39,8 @@ import {
 } from './components/StylingPanel';
 import {AnnotationEditor} from './components/AnnotationEditor';
 import {SecurityPanel} from './components/SecurityPanel';
+import {RestoreBanner} from './components/RestoreBanner/RestoreBanner';
+import {SessionState} from './types/session';
 import {CloudBoxEditorProvider} from './contexts/CloudBoxEditorContext';
 import {ThemeProvider} from './contexts/ThemeContext';
 import {
@@ -112,7 +114,14 @@ function AppContent() {
   });
   const [annotations, setAnnotations] = useState<Node[]>([]);
   const [editingAnnotation, setEditingAnnotation] = useState<Node | null>(null);
+  const [hiddenGroupIds, setHiddenGroupIds] = useState<Set<string>>(new Set());
   const [securityIssues, setSecurityIssues] = useState<SecurityIssue[]>([]);
+  const [restoredPositions, setRestoredPositions] = useState<Record<
+    string,
+    {x: number; y: number}
+  > | null>(null);
+  const [savedSession, setSavedSession] = useState<SessionState | null>(null);
+  const [showRestoreBanner, setShowRestoreBanner] = useState(false);
   const reactFlowInstance = useReactFlow();
 
   // Auto-apply topology filters when switching layout modes
@@ -475,13 +484,25 @@ function AppContent() {
       } else {
         // Update React Flow nodes (topology boxes, legend, etc.)
         const allNodes = reactFlowInstance.getNodes();
+        const isCurrentlyHidden =
+          allNodes.find((n) => n.id === groupId)?.hidden ??
+          hiddenGroupIds.has(groupId);
         const updatedNodes = allNodes.map((node) =>
-          node.id === groupId ? {...node, hidden: !node.hidden} : node,
+          node.id === groupId ? {...node, hidden: !isCurrentlyHidden} : node,
         );
         reactFlowInstance.setNodes(updatedNodes);
+        setHiddenGroupIds((prev) => {
+          const next = new Set(prev);
+          if (next.has(groupId)) {
+            next.delete(groupId);
+          } else {
+            next.add(groupId);
+          }
+          return next;
+        });
       }
     },
-    [customNodes, reactFlowInstance],
+    [customNodes, hiddenGroupIds, reactFlowInstance],
   );
 
   // Handle select group
@@ -879,6 +900,108 @@ function AppContent() {
     [reactFlowInstance],
   );
 
+  // Serialize current diagram state and POST it to the server
+  const saveCurrentSession = useCallback(async () => {
+    if (selectedStacks.length === 0) return;
+    const allNodes = reactFlowInstance.getNodes();
+    const nodePositions: Record<string, {x: number; y: number}> = {};
+    allNodes.forEach((n) => {
+      nodePositions[n.id] = n.position;
+    });
+    const state: SessionState = {
+      version: '1',
+      savedAt: new Date().toISOString(),
+      selectedStacks,
+      layoutMode,
+      nodePositions,
+      customNodes,
+      customEdges,
+      annotations,
+      hiddenTypes: Array.from(hiddenTypes),
+      baseHiddenTypes: Array.from(baseHiddenTypes),
+      deletedCfnEdgeIds: Array.from(deletedCfnEdgeIds),
+      hiddenGroupIds: Array.from(hiddenGroupIds),
+      stylingOptions,
+    };
+    await apiClient.saveSession(state);
+  }, [
+    selectedStacks,
+    layoutMode,
+    customNodes,
+    customEdges,
+    annotations,
+    hiddenTypes,
+    baseHiddenTypes,
+    deletedCfnEdgeIds,
+    hiddenGroupIds,
+    stylingOptions,
+    reactFlowInstance,
+  ]);
+
+  // On startup, check whether a saved session exists and offer to restore it
+  useEffect(() => {
+    apiClient.loadSession().then((session) => {
+      if (session) {
+        setSavedSession(session);
+        setShowRestoreBanner(true);
+      }
+    });
+  }, []);
+
+  // Connect to the server's SSE stream to receive the shutdown signal
+  useEffect(() => {
+    const es = new EventSource('/api/events');
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(String(e.data)) as {type: string};
+        if (data.type === 'shutdown') {
+          saveCurrentSession();
+        }
+      } catch {
+        // Ignore malformed events
+      }
+    };
+    return () => es.close();
+  }, [saveCurrentSession]);
+
+  // Periodic autosave every 60 seconds while stacks are loaded
+  useEffect(() => {
+    if (selectedStacks.length === 0) return;
+    const id = setInterval(saveCurrentSession, 60000);
+    return () => clearInterval(id);
+  }, [selectedStacks.length, saveCurrentSession]);
+
+  // Restore all state from a saved session
+  const handleRestoreSession = useCallback(() => {
+    if (!savedSession) return;
+    setSelectedStacks(savedSession.selectedStacks);
+    setLayoutMode(savedSession.layoutMode as LayoutMode);
+    setCustomNodes(savedSession.customNodes);
+    setCustomEdges(savedSession.customEdges as Array<Edge<CustomEdgeData>>);
+    setAnnotations(savedSession.annotations);
+    setBaseHiddenTypes(new Set(savedSession.baseHiddenTypes));
+    setDeletedCfnEdgeIds(new Set(savedSession.deletedCfnEdgeIds));
+    setHiddenGroupIds(new Set(savedSession.hiddenGroupIds));
+    setStylingOptions(savedSession.stylingOptions);
+    setRestoredPositions(savedSession.nodePositions);
+    setShowRestoreBanner(false);
+    setSavedSession(null);
+    apiClient.clearSession();
+  }, [savedSession]);
+
+  // Dismiss the restore banner without applying the session
+  const handleDismissSession = useCallback(() => {
+    setShowRestoreBanner(false);
+    setSavedSession(null);
+    apiClient.clearSession();
+  }, []);
+
+  // Changing layout mode intentionally should reset any restored node positions
+  const handleLayoutModeChange = useCallback((mode: LayoutMode) => {
+    setLayoutMode(mode);
+    setRestoredPositions(null);
+  }, []);
+
   // Convert stacks to React Flow format
   const {nodes, edges, availableTypes} = useMemo(() => {
     if (Object.keys(stackDataMap).length === 0) {
@@ -1121,8 +1244,16 @@ function AppContent() {
     // Add custom nodes and annotations to the nodes list
     const allNodes = [...filteredNodes, ...customNodes, ...annotations];
 
+    // Apply node positions saved from a previous session
+    const finalNodes = restoredPositions
+      ? allNodes.map((n) => ({
+          ...n,
+          position: restoredPositions[n.id] ?? n.position,
+        }))
+      : allNodes;
+
     return {
-      nodes: allNodes,
+      nodes: finalNodes,
       edges: allEdges,
       availableTypes: Array.from(types),
     };
@@ -1137,6 +1268,7 @@ function AppContent() {
     stylingOptions,
     annotations,
     securityIssues,
+    restoredPositions,
   ]);
 
   // Get all group nodes (including topology boxes and legend)
@@ -1145,13 +1277,18 @@ function AppContent() {
     const customGroups = customNodes.filter(
       (node) => node.type === 'customGroup',
     );
-    const topologyGroups = nodes.filter(
-      (node) =>
-        node.type === 'group' && (node.data?.isCloudBox || node.data?.isVpcBox),
-    );
-    const legendNodes = nodes.filter((node) => node.type === 'legendNode');
+    const topologyGroups = nodes
+      .filter(
+        (node) =>
+          node.type === 'group' &&
+          (node.data?.isCloudBox || node.data?.isVpcBox),
+      )
+      .map((node) => ({...node, hidden: hiddenGroupIds.has(node.id)}));
+    const legendNodes = nodes
+      .filter((node) => node.type === 'legendNode')
+      .map((node) => ({...node, hidden: hiddenGroupIds.has(node.id)}));
     return [...customGroups, ...topologyGroups, ...legendNodes];
-  }, [customNodes, nodes]);
+  }, [customNodes, nodes, hiddenGroupIds]);
 
   // Track selected node count from React Flow instance
   const [selectedNodeCount, setSelectedNodeCount] = useState(0);
@@ -1452,6 +1589,13 @@ function AppContent() {
 
   return (
     <div className="app">
+      {showRestoreBanner && savedSession && (
+        <RestoreBanner
+          savedAt={savedSession.savedAt}
+          onRestore={handleRestoreSession}
+          onDismiss={handleDismissSession}
+        />
+      )}
       <header className="app-header">
         <h1>CDK-Canvas</h1>
         <p>Interactive CDK Diagram Designer</p>
@@ -1469,7 +1613,7 @@ function AppContent() {
             Object.keys(stackDataMap).length > 0 && (
               <Toolbar
                 layoutMode={layoutMode}
-                onLayoutModeChange={setLayoutMode}
+                onLayoutModeChange={handleLayoutModeChange}
                 onSaveLayout={handleSaveLayout}
                 onLoadLayout={handleLoadLayout}
                 onExport={() => setShowExportDialog(true)}
