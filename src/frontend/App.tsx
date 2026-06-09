@@ -961,17 +961,78 @@ function AppContent() {
             }
           }
         });
+
+        // Also scan stack outputs for exported CIDR values
+        Object.values(stack.outputs ?? {}).forEach((output) => {
+          const value = output.value;
+          const outputName = output.exportName || output.id;
+
+          // Direct CIDR string in the output value
+          if (
+            typeof value === 'string' &&
+            /^\d+\.\d+\.\d+\.\d+\/\d+$/.test(value)
+          ) {
+            cidrBlocks.push({
+              name: outputName,
+              cidr: value,
+              type: 'subnet',
+              color: '#2196f3',
+            });
+            return;
+          }
+
+          // Fn::GetAtt pointing at a resource's CidrBlock attribute
+          if (value && typeof value === 'object') {
+            const obj = value as Record<string, unknown>;
+            if ('Fn::GetAtt' in obj) {
+              const attr = Array.isArray(obj['Fn::GetAtt'])
+                ? (obj['Fn::GetAtt'] as string[])
+                : null;
+              if (attr && attr.length === 2 && attr[1] === 'CidrBlock') {
+                const resource = stack.resources[attr[0]];
+                if (resource) {
+                  const cidr = extractPropertyValue(
+                    resource.properties?.CidrBlock,
+                  );
+                  if (cidr) {
+                    const type =
+                      resource.type === 'AWS::EC2::VPC' ? 'vpc' : 'subnet';
+                    cidrBlocks.push({
+                      name: outputName,
+                      cidr,
+                      type,
+                      color: type === 'vpc' ? '#4caf50' : '#2196f3',
+                    });
+                  }
+                }
+              }
+            }
+          }
+        });
       });
     }
 
+    // Deduplicate by CIDR value — resources are scanned first so their
+    // logical IDs take precedence over output-based names for the same range.
+    const seenCidrs = new Set<string>();
+    const finalCidrBlocks = cidrBlocks.filter((entry) => {
+      if (seenCidrs.has(entry.cidr)) return false;
+      seenCidrs.add(entry.cidr);
+      return true;
+    });
+
     let result;
-    // If only one stack, use single-stack flow
-    if (selectedStacks.length === 1) {
+    if (layoutMode === 'topology') {
+      // Always route topology through multiStackToFlow so that the AWS Cloud
+      // box, VPC groups, and CIDR legend are created for both single and
+      // multi-stack selections.
+      result = multiStackToFlow(stackDataMap, layoutMode, finalCidrBlocks);
+    } else if (selectedStacks.length === 1) {
       const stackName = selectedStacks[0];
-      result = stackToFlow(stackDataMap[stackName], layoutMode, cidrBlocks);
+      result = stackToFlow(stackDataMap[stackName], layoutMode);
     } else {
       // Multi-stack: merge and convert
-      result = multiStackToFlow(stackDataMap, layoutMode, cidrBlocks);
+      result = multiStackToFlow(stackDataMap, layoutMode, finalCidrBlocks);
     }
 
     // Collect all unique resource types

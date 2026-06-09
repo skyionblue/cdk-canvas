@@ -16,12 +16,9 @@ export interface LegendNodeData {
 export function LegendNode({data}: NodeProps<LegendNodeData>) {
   const {cidrBlocks} = data;
 
-  if (!cidrBlocks || cidrBlocks.length === 0) {
-    return null;
-  }
-
-  const vpcs = cidrBlocks.filter((c) => c.type === 'vpc');
-  const subnets = cidrBlocks.filter((c) => c.type === 'subnet');
+  const vpcs = (cidrBlocks ?? []).filter((c) => c.type === 'vpc');
+  const subnets = (cidrBlocks ?? []).filter((c) => c.type === 'subnet');
+  const isEmpty = vpcs.length === 0 && subnets.length === 0;
 
   return (
     <div className="legend-node">
@@ -29,6 +26,10 @@ export function LegendNode({data}: NodeProps<LegendNodeData>) {
         <h4>CIDR Blocks</h4>
       </div>
       <div className="legend-node-content">
+        {isEmpty && (
+          <p className="legend-empty">No VPC or subnet CIDR blocks detected</p>
+        )}
+
         {vpcs.length > 0 && (
           <div className="legend-section">
             <div className="legend-section-title">VPCs</div>

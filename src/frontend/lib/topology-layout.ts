@@ -147,29 +147,27 @@ export function createTopologyLayout(
     selectable: false,
   });
 
-  // Add legend node if CIDR blocks are available
-  if (cidrBlocks && cidrBlocks.length > 0) {
-    // Position legend at bottom-right corner of AWS Cloud box
-    const legendWidth = 300; // Approximate legend width
-    const legendPadding = 40; // Padding from edge
-    const cloudBoxX = 20;
-    const cloudBoxY = 20;
+  // Always add the CIDR legend in topology view, even when no blocks are
+  // found, so users can see the section and double-click to edit.
+  const legendWidth = 300;
+  const legendPadding = 40;
+  const cloudBoxX = 20;
+  const cloudBoxY = 20;
 
-    layoutNodes.push({
-      id: 'cidr-legend-node',
-      type: 'legendNode',
-      position: {
-        x: cloudBoxX + cloudWidth - legendWidth - legendPadding,
-        y: cloudBoxY + cloudHeight - legendPadding - 20,
-      },
-      data: {
-        label: 'CIDR Blocks',
-        cidrBlocks,
-      },
-      draggable: true,
-      selectable: true,
-    });
-  }
+  layoutNodes.push({
+    id: 'cidr-legend-node',
+    type: 'legendNode',
+    position: {
+      x: cloudBoxX + cloudWidth - legendWidth - legendPadding,
+      y: cloudBoxY + cloudHeight - legendPadding - 20,
+    },
+    data: {
+      label: 'CIDR Blocks',
+      cidrBlocks: cidrBlocks ?? [],
+    },
+    draggable: true,
+    selectable: true,
+  });
 
   return {nodes: layoutNodes, edges};
 }
